@@ -51,7 +51,7 @@ Use the arrow keys to guide the snake. Eat the red food to grow and score points
 
 - 🎮 Start menu with difficulty selection (Easy / Medium / Hard)
 - ⏱ Countdown timer before each game starts
-- 📈 Level system — speed increases as you score higher
+- 📈 Level system where speed increases as you score higher
 - 🏆 Persistent high score saved in your browser
 - 🔊 Chiptune background music + sound effects (Web Audio API)
 - ⏸ Pause, Replay, and Menu buttons
