@@ -39,6 +39,8 @@ Use the arrow keys to guide the snake. Eat the red food to grow and score points
   </table>
 </p>
 
+<p align="center">Mobile support is also included! Instead of using arrow keys, press the arrow buttons below the restart, pause, and menu buttons!</p>
+
 <p align="center">
   <img src="screenshots/gameover.png" width="60%" alt="Game over screen" />
 </p>
