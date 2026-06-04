@@ -280,7 +280,9 @@
   <button class="start-btn" onclick="goToGame()">▶ START GAME</button>
   <div class="controls-hint">
     ARROW KEYS — MOVE<br>
-    SPACE — PAUSE
+    SPACE — PAUSE / RESUME<br>
+    R — RESTART<br>
+    M — MAIN MENU
   </div>
   <button class="music-toggle on" id="music-btn" onclick="toggleMusic()">♪ MUSIC: ON</button>
 </div>
@@ -691,6 +693,8 @@ if (musicOn) startMusic();
 document.addEventListener('keydown', changeDirection);
 document.addEventListener('keydown', e => {
   if (e.code === 'Space' && running) { e.preventDefault(); togglePause(); }
+  if (e.code === 'KeyR') { e.preventDefault(); replayGame(); }
+  if (e.code === 'KeyM') { e.preventDefault(); goToMenu(); }
 });
 </script>
 </body>
