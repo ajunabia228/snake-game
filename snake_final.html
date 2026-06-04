@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Snake</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #0d0d1a;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    h1 {
+      color: #00ff88;
+      font-size: 2rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 20px #00ff8866;
+    }
+
+    #score-display {
+      color: #00ff88;
+      font-size: 1.1rem;
+      letter-spacing: 0.2em;
+      margin-bottom: 0.75rem;
+      opacity: 0.85;
+    }
+
+    .canvas-wrap {
+      position: relative;
+    }
+
+    canvas {
+      display: block;
+      border: 2px solid #00ff8855;
+      box-shadow: 0 0 30px #00ff8822, inset 0 0 30px #00000088;
+    }
+
+    /* Overlay shown before game starts and on game over */
+    #overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(13,13,26,0.88);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    #overlay-title {
+      color: #00ff88;
+      font-size: 1.3rem;
+      letter-spacing: 0.2em;
+      margin-bottom: 6px;
+    }
+
+    #overlay-score {
+      color: #aaa;
+      font-size: 0.9rem;
+      letter-spacing: 0.15em;
+      margin-bottom: 10px;
+      min-height: 1.2em;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 1rem;
+    }
+
+    button {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 9px 20px;
+      border: 1.5px solid #00ff8877;
+      background: transparent;
+      color: #00ff88;
+      cursor: pointer;
+      transition: background 0.15s, box-shadow 0.15s;
+      border-radius: 2px;
+    }
+
+    button:hover {
+      background: #00ff8822;
+      box-shadow: 0 0 12px #00ff8844;
+    }
+
+    button:disabled {
+      opacity: 0.3;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    #pause-btn { border-color: #88aaff77; color: #88aaff; }
+    #pause-btn:hover { background: #88aaff22; box-shadow: 0 0 12px #88aaff44; }
+
+    #replay-btn { border-color: #ff886677; color: #ff8866; }
+    #replay-btn:hover { background: #ff886622; box-shadow: 0 0 12px #ff886644; }
+  </style>
+</head>
+<body>
+
+  <h1>Snake</h1>
+  <div id="score-display">Score: <span id="score">0</span></div>
+
+  <div class="canvas-wrap">
+    <canvas id="gameCanvas" width="300" height="300"></canvas>
+
+    <div id="overlay">
+      <div id="overlay-title">Ready?</div>
+      <div id="overlay-score"></div>
+      <button id="start-btn" onclick="startGame()">▶ Start</button>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button id="pause-btn" onclick="togglePause()" disabled>⏸ Pause</button>
+    <button id="replay-btn" onclick="replayGame()" disabled>↺ Replay</button>
+  </div>
+
+  <script>
+    // Snake game — originally based on:
+    // https://www.freecodecamp.org/news/think-like-a-programmer-how-to-build-snake-using-only-javascript-html-and-css-7b1479c3339e/
+    // by Panayiotis Nicolaou
+    // Modified and extended by Antonio Unabia
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let dx, dy, score, foodX, foodY;
+    let changingDirection, paused, running, gameLoopTimeout;
+    let snake;
+
+    function initState() {
+      dx = 10; dy = 0; score = 0;
+      changingDirection = false;
+      paused = false;
+      running = false;
+      snake = [
+        {x:150,y:150},{x:140,y:150},
+        {x:130,y:150},{x:120,y:150},{x:110,y:150}
+      ];
+      document.getElementById('score').textContent = 0;
+    }
+
+    function clearCanvas() {
+      ctx.fillStyle = '#0d0d1a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function drawSnakePart(part) {
+      ctx.fillStyle = '#00ff88';
+      ctx.strokeStyle = '#005533';
+      ctx.fillRect(part.x, part.y, 10, 10);
+      ctx.strokeRect(part.x, part.y, 10, 10);
+    }
+
+    function drawSnake() { snake.forEach(drawSnakePart); }
+
+    function drawFood() {
+      ctx.fillStyle = '#ff4455';
+      ctx.strokeStyle = '#991122';
+      ctx.fillRect(foodX, foodY, 10, 10);
+      ctx.strokeRect(foodX, foodY, 10, 10);
+    }
+
+    function randomTen(min, max) {
+      return Math.round((Math.random() * (max - min) + min) / 10) * 10;
+    }
+
+    function createFood() {
+      foodX = randomTen(0, canvas.width - 10);
+      foodY = randomTen(0, canvas.height - 10);
+      snake.forEach(p => {
+        if (p.x === foodX && p.y === foodY) createFood();
+      });
+    }
+
+    function advanceSnake() {
+      const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+      snake.unshift(head);
+      const ate = snake[0].x === foodX && snake[0].y === foodY;
+      if (ate) {
+        score += 10;
+        document.getElementById('score').textContent = score;
+        createFood();
+      } else {
+        snake.pop();
+      }
+    }
+
+    function changeDirection(e) {
+      if (!running || paused) return;
+      if (changingDirection) return;
+      changingDirection = true;
+      const L=37, U=38, R=39, D=40;
+      const k = e.keyCode;
+      const goingUp=dy===-10, goingDown=dy===10;
+      const goingRight=dx===10, goingLeft=dx===-10;
+      if (k===L && !goingRight) { dx=-10; dy=0; }
+      if (k===U && !goingDown)  { dx=0;  dy=-10; }
+      if (k===R && !goingLeft)  { dx=10; dy=0; }
+      if (k===D && !goingUp)    { dx=0;  dy=10; }
+    }
+
+    function didGameEnd() {
+      for (let i = 4; i < snake.length; i++) {
+        if (snake[i].x===snake[0].x && snake[i].y===snake[0].y) return true;
+      }
+      return snake[0].x < 0 || snake[0].x > canvas.width-10
+          || snake[0].y < 0 || snake[0].y > canvas.height-10;
+    }
+
+    function showOverlay(title, scoreLine, btnHTML) {
+      const ov = document.getElementById('overlay');
+      document.getElementById('overlay-title').textContent = title;
+      document.getElementById('overlay-score').textContent = scoreLine;
+      ov.innerHTML = `
+        <div id="overlay-title">${title}</div>
+        <div id="overlay-score">${scoreLine}</div>
+        ${btnHTML}
+      `;
+      ov.style.display = 'flex';
+    }
+
+    function hideOverlay() {
+      document.getElementById('overlay').style.display = 'none';
+    }
+
+    function main() {
+      if (didGameEnd()) {
+        running = false;
+        document.getElementById('pause-btn').disabled = true;
+        document.getElementById('replay-btn').disabled = false;
+        showOverlay(
+          'Game Over',
+          'Score: ' + score,
+          `<button onclick="replayGame()" style="border-color:#ff886677;color:#ff8866;">↺ Play Again</button>`
+        );
+        return;
+      }
+      gameLoopTimeout = setTimeout(() => {
+        changingDirection = false;
+        clearCanvas();
+        drawFood();
+        advanceSnake();
+        drawSnake();
+        main();
+      }, 100);
+    }
+
+    function startGame() {
+      initState();
+      createFood();
+      hideOverlay();
+      running = true;
+      document.getElementById('pause-btn').disabled = false;
+      document.getElementById('replay-btn').disabled = false;
+      main();
+    }
+
+    function togglePause() {
+      if (!running) return;
+      const btn = document.getElementById('pause-btn');
+      if (!paused) {
+        paused = true;
+        clearTimeout(gameLoopTimeout);
+        btn.textContent = '▶ Resume';
+        showOverlay('Paused', '', `<button onclick="togglePause()">▶ Resume</button>`);
+      } else {
+        paused = false;
+        btn.textContent = '⏸ Pause';
+        hideOverlay();
+        main();
+      }
+    }
+
+    function replayGame() {
+      clearTimeout(gameLoopTimeout);
+      startGame();
+    }
+
+    // Draw initial blank canvas
+    initState();
+    clearCanvas();
+
+    document.addEventListener('keydown', changeDirection);
+
+    // Space bar to pause
+    document.addEventListener('keydown', e => {
+      if (e.code === 'Space' && running) { e.preventDefault(); togglePause(); }
+    });
+  </script>
+</body>
+</html>
