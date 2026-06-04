@@ -3,7 +3,7 @@
 A classic Snake game built from scratch using vanilla HTML, CSS, and JavaScript. No frameworks, no libraries — just clean browser code with a retro arcade aesthetic.
 
 <p align="center">
-  <img src="screenshots/mainmenu.png" width="60%" alt="Main Menu Screen" />
+  <img src="screenshots/menu.png" width="60%" alt="Main Menu Screen" />
 </p>
 
 <p align="center">
