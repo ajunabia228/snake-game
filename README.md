@@ -1,6 +1,6 @@
-# 🐍 Snake — Retro Edition
+# 🐍 Snake: Retro Edition
 
-A classic Snake game built from scratch using vanilla HTML, CSS, and JavaScript. No frameworks, no libraries — just clean browser code with a retro arcade aesthetic.
+A classic Snake game built from scratch using vanilla HTML, CSS, and JavaScript. No frameworks or libraries, it's just clean browser code with a retro arcade aesthetic 🕹️
 
 <p align="center">
   <img src="screenshots/menu.png" width="60%" alt="Main Menu Screen" />
