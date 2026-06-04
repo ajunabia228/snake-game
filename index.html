@@ -262,6 +262,41 @@
       50%      { color: #fff; }
     }
     .new-hi { animation: flashGold 0.5s ease 3; }
+
+    /* Mobile controls */
+    .mobile-controls {
+      display: none;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      width: 300px;
+      margin-top: 12px;
+    }
+
+    .mobile-controls .spacer { visibility: hidden; }
+
+    .d-btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 1rem;
+      padding: 16px;
+      border: 1.5px solid #00ff8855;
+      background: #00ff8811;
+      color: var(--green);
+      cursor: pointer;
+      border-radius: 4px;
+      text-align: center;
+      user-select: none;
+      -webkit-user-select: none;
+      active: background: #00ff8833;
+    }
+
+    .d-btn:active { background: #00ff8833; }
+
+    /* Only show on touch devices */
+    @media (hover: none) and (pointer: coarse) {
+      .mobile-controls { display: grid; }
+      canvas { width: 90vw; height: 90vw; }
+      .game-header { width: 90vw; }
+    }
   </style>
 </head>
 <body>
@@ -318,6 +353,15 @@
     <button class="foot-btn replay-btn" id="replay-btn" onclick="replayGame()" disabled>↺ REPLAY</button>
     <button class="foot-btn menu-btn"  onclick="goToMenu()">⌂ MENU</button>
   </div>
+</div>
+
+<div class="mobile-controls">
+  <div class="spacer"></div>
+  <button class="d-btn" ontouchstart="mobileDir('UP')">▲</button>
+  <div class="spacer"></div>
+  <button class="d-btn" ontouchstart="mobileDir('LEFT')">◀</button>
+  <button class="d-btn" ontouchstart="mobileDir('DOWN')">▼</button>
+  <button class="d-btn" ontouchstart="mobileDir('RIGHT')">▶</button>
 </div>
 
 <script>
@@ -683,6 +727,16 @@ function replayGame() {
   createFood();
   clearCanvas();
   showOverlay('READY?', '', '▶ PLAY', 'btn-green', 'startGame()');
+}
+
+function mobileDir(dir) {
+  if (!running || paused || changingDirection) return;
+  changingDirection = true;
+  const gU=dy===-10, gD=dy===10, gR=dx===10, gL=dx===-10;
+  if (dir==='LEFT'  && !gR) { dx=-10; dy=0; }
+  if (dir==='UP'    && !gD) { dx=0;  dy=-10; }
+  if (dir==='RIGHT' && !gL) { dx=10; dy=0; }
+  if (dir==='DOWN'  && !gU) { dx=0;  dy=10; }
 }
 
 // init
