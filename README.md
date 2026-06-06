@@ -14,7 +14,7 @@ A classic Snake game built from scratch using vanilla HTML, CSS, and JavaScript.
 
 ---
 
-## Gameplay
+## 🎮 Gameplay
 
 Use the arrow keys to guide the snake. Eat the red food to grow and score points. Don't hit the walls or yourself!
 
@@ -49,7 +49,7 @@ Use the arrow keys to guide the snake. Eat the red food to grow and score points
 
 ---
 
-## Features
+## 💡 Features
 
 - 🎮 Start menu with difficulty selection (Easy / Medium / Hard)
 - ⏱ Countdown timer before each game starts
@@ -62,7 +62,7 @@ Use the arrow keys to guide the snake. Eat the red food to grow and score points
 
 ---
 
-## Run locally
+## 🏃 Run locally
 
 ```bash
 git clone https://github.com/ajunabia228/snake-game.git
@@ -73,7 +73,7 @@ Then open `index.html` in your browser, or use the **Live Server** extension in 
 
 ---
 
-## Built with
+## 👷‍♂️ Built with
 
 <p align="center">
   <a href="https://developer.mozilla.org/en-US/docs/Web/HTML">
@@ -92,7 +92,7 @@ Then open `index.html` in your browser, or use the **Live Server** extension in 
 
 ---
 
-## Credits
+## 🎬 Credits
 
 Base game logic adapted from [Think like a programmer: How to build Snake](https://www.freecodecamp.org/news/think-like-a-programmer-how-to-build-snake-using-only-javascript-html-and-css-7b1479c3339e/) by Panayiotis Nicolaou on freeCodeCamp. Extended with additional features and UI improvements.
 
